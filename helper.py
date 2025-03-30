@@ -25,19 +25,20 @@ def fetch_words(selected_user, df):
     
 
 def fetch_emojis(selected_user, df):
-    emojis = []
-    if(selected_user != "Overall"):
+    if selected_user != "Overall":
         df = df[df['Sender'] == selected_user]
+    
+    emoji_pattern = re.compile('|'.join(re.escape(e) for e in emoji.EMOJI_DATA.keys()))
+    
+    emojis = []
     for msg in df['Message']:
-        emojis.extend([c for c in msg if c in emoji.EMOJI_DATA])
+        emojis.extend(emoji_pattern.findall(msg))
     
     emoji_df = Counter(emojis)
     top_5_emojis = emoji_df.most_common(5)
-    arr=[]
-    for i in top_5_emojis:
-        arr.extend(i[0])
+    arr = [e for e, count in top_5_emojis]
     
-    return len(emojis), arr
+    return len(emojis), arr
 
 def media_shared(selected_user, df):
     if(selected_user != "Overall"):
